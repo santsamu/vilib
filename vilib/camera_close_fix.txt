@@ -1,0 +1,21 @@
+    def camera_close():
+        if Vilib.camera_thread != None:
+            Vilib.camera_run = False
+            time.sleep(0.1)
+            # Wait for camera thread to finish
+            if Vilib.camera_thread.is_alive():
+                Vilib.camera_thread.join(timeout=2.0)
+            
+            # Properly close and reinitialize Picamera2
+            try:
+                if Vilib.picam2 is not None:
+                    Vilib.picam2.close()
+                    time.sleep(0.1)
+                    Vilib.picam2 = Picamera2()
+            except Exception as e:
+                print(f"Warning during camera cleanup: {e}")
+                # Force recreation of Picamera2 object
+                Vilib.picam2 = Picamera2()
+            
+            # Reset thread reference
+            Vilib.camera_thread = None
